@@ -13,7 +13,7 @@ count=1
 # Create new instance that you can use to store IDs
 $redis = Redis.new
 
-def check_attrib(attrib)
+def has_avatar_cda(attrib)
   # Check each user to see if they have set their Avatar
   if attrib.nil?
     custom_attribs = {
@@ -62,7 +62,7 @@ begin
     all_users = []
     result.records.each do |user|
       user_data = {}
-      cus_attr = check_attrib(user.avatar.image_url)
+      cus_attr = has_avatar_cda(user.avatar.image_url)
       # We need a unique identifer (email, id or user_id) to update the user
       user_data[:id] = user.id
       # Create/update the user with a custom attribute
