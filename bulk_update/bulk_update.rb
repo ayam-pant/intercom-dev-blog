@@ -3,7 +3,7 @@ require 'retries'
 require 'redis'
 
 # Initialize the Intercom client
-intercom = Intercom::Client.new(token: ENV['TEST_PAT'])
+intercom = Intercom::Client.new(token: ENV['PROD_PAT'])
 MAX_RETRIES = 3
 SCROLL_RESET_TIME = 60
 scroll_num = 0
@@ -73,12 +73,11 @@ begin
     scroll_num = result.records.length
     scroll_param = result.scroll_param
     # Check to see if the most recent request is empty (no more users to update)
-    if scroll_num > 0
-      bulk = intercom.users.submit_bulk_job(create_items: all_users)
-      puts("Bulk Request Number #{count}")
-      redis_store(bulk.id)
-      puts(bulk.id)
-      count+=1
-    end
+    exit unless  scroll_num > 0
+    bulk = intercom.users.submit_bulk_job(create_items: all_users)
+    puts("Bulk Request Number #{count}")
+    redis_store(bulk.id)
+    puts(bulk.id)
+    count+=1
   end
-end while scroll_num > 0
+end while true
