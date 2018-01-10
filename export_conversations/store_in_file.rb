@@ -78,4 +78,4 @@ class ConvoSetup
   end
 end
 
-ConvoSetup.new("AT", "temp.file").run
+ConvoSetup.new("AT", "convo_output.txt").run

@@ -9,14 +9,6 @@ class ConvoParser
     @intercom = client
   end
 
-  def print_output(content)
-    puts(content)
-  end
-
-  def parse_convos(payload, attr)
-    puts JSON.pretty_generate(payload[attr])
-  end
-
   def parse_single_convo(convo)
     puts "<XXXXXXXXXXXXX CONVERSATION XXXXXXXXXXXXX>"
     puts JSON.pretty_generate(convo)
@@ -34,14 +26,14 @@ class ConvoSetup
     @convo_parser = ConvoParser.new(intercom)
   end
 
-  def get_all_conversations(client)
+  def get_all_conversations
     # Get the first page of your conversations
-    convos = client.get("/conversations", "")
+    convos = intercom.get("/conversations", "")
     convos
   end
 
   def run
-    result = get_all_conversations(intercom)
+    result = get_all_conversations
     # Parse through each conversation to see what is provided via the list
     result["conversations"].each do |single_convo|
       convo_parser.parse_single_convo(single_convo)
