@@ -42,16 +42,6 @@ class ConvoParser
       parse_conversation_part(convo_part)
     end
   end
-
-  def check_rate_limit
-    current_rate = yield
-    write_to_file("RATE LIMIT: #{intercom.rate_limit_details[:remaining]}")
-    if intercom.rate_limit_details[:remaining] <= 30
-      sleep 10
-      write_to_file("SLEEPING")
-    end
-    current_rate
-  end
 end
 
 class ConvoSetup
@@ -66,17 +56,13 @@ class ConvoSetup
 
   def get_single_convo(convo_id)
     # Get a single conversation
-    convo_parser.check_rate_limit do
-      intercom.conversations.find(id: convo_id)
-    end
+    intercom.conversations.find(id: convo_id)
   end
 
   def get_first_page_of_conversations()
     # Get the first page of your conversations
-    convo_parser.check_rate_limit do
-      convos = intercom.get("/conversations", "")
-      convos
-    end
+    convos = intercom.get("/conversations", "")
+    convos
   end
 
   def get_next_page_of_conversations(next_page_url)
@@ -91,17 +77,13 @@ class ConvoSetup
     # Set this to TRUE initially so we process the first page
     current_page = 1
 
-    until current_page.nil? do
+    while current_page
       # Parse through each conversation to see what is provided via the list
       result["conversations"].each do |single_convo|
         convo_parser.parse_conversation_parts(get_single_convo(single_convo['id']))
       end
       convo_parser.write_to_file("PAGE #{result['pages']['page']}")
       current_page = result['pages']['next']
-      if current_page.nil?
-        # Dont make any more calls since we are on the last page
-        break
-      end
       result = get_next_page_of_conversations(result['pages']['next'])
     end
   end
